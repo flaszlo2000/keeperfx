@@ -43,6 +43,8 @@
 #include <toml.h>
 #include "post_inc.h"
 
+#include "platform/file_iterator/file_iterator.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -309,26 +311,29 @@ short level_lif_file_parse(char *fname, char *buf, long buflen)
  */
 TbBool find_and_load_lif_files(void)
 {
-    unsigned char* buf = LbMemoryAlloc(MAX_LIF_SIZE);
-    if (buf == NULL)
-    {
-        ERRORLOG("Can't allocate memory for .LIF files parsing.");
-        return false;
-  }
-  short result = false;
-  char* fname = prepare_file_path(FGrp_CmpgLvls, "*.lif");
-  struct TbFileFind fileinfo;
-  int rc = LbFileFindFirst(fname, &fileinfo, 0x21u);
-  while (rc != -1)
+  unsigned char* buf = LbMemoryAlloc(MAX_LIF_SIZE);
+  if (buf == NULL)
   {
-    fname = prepare_file_path(FGrp_CmpgLvls,fileinfo.Filename);
-    long i = LbFileLength(fname);
+    ERRORLOG("Can't allocate memory for .LIF files parsing.");
+    return false;
+  }
+
+  short result = false;
+  struct TbFileFind fileinfo;
+
+  char *dirPath = prepare_file_path(FGrp_CmpgLvls, "");
+  int rc = findfirst(dirPath, ".lif", fileinfo.Filename);
+
+  while (rc)
+  {
+    dirPath = prepare_file_path(FGrp_CmpgLvls,fileinfo.Filename);
+    long i = LbFileLength(dirPath);
     if ((i < 0) || (i >= MAX_LIF_SIZE))
     {
       WARNMSG("File \"%s\" too long (Max size %d)", fileinfo.Filename, MAX_LIF_SIZE);
 
     } else
-    if (LbFileLoadAt(fname, buf) != i)
+    if (LbFileLoadAt(dirPath, buf) != i)
     {
       WARNMSG("Unable to read .LIF file, \"%s\"", fileinfo.Filename);
     } else
@@ -337,10 +342,12 @@ TbBool find_and_load_lif_files(void)
       if (level_lif_file_parse(fileinfo.Filename, (char *)buf, i))
         result = true;
     }
-    rc = LbFileFindNext(&fileinfo);
+
+    rc = findnext(fileinfo.Filename);
   }
-  LbFileFindEnd(&fileinfo);
+  findclose();
   LbMemoryFree(buf);
+
   return result;
 }
 
@@ -631,20 +638,23 @@ TbBool find_and_load_lof_files(void)
       ERRORLOG("Can't allocate memory for .LOF files parsing.");
       return false;
     }
+
     short result = false;
-    char* fname = prepare_file_path(FGrp_CmpgLvls, "*.lof");
     struct TbFileFind fileinfo;
-    int rc = LbFileFindFirst(fname, &fileinfo, 0x21u);
+
+    char *dirPath = prepare_file_path(FGrp_CmpgLvls, "");
+    int rc = findfirst(dirPath, ".lof", fileinfo.Filename);
+
     while (rc != -1)
     {
-        fname = prepare_file_path(FGrp_CmpgLvls,fileinfo.Filename);
-        long i = LbFileLength(fname);
+        dirPath = prepare_file_path(FGrp_CmpgLvls,fileinfo.Filename);
+        long i = LbFileLength(dirPath);
         if ((i < 0) || (i >= MAX_LIF_SIZE))
         {
           WARNMSG("File '%s' too long (Max size %d)", fileinfo.Filename, MAX_LIF_SIZE);
 
         } else
-        if (LbFileLoadAt(fname, buf) != i)
+        if (LbFileLoadAt(dirPath, buf) != i)
         {
           WARNMSG("Unable to read .LOF file, '%s'", fileinfo.Filename);
         } else
@@ -653,10 +663,11 @@ TbBool find_and_load_lof_files(void)
           if (level_lof_file_parse(fileinfo.Filename, (char *)buf, i))
             result = true;
         }
-        rc = LbFileFindNext(&fileinfo);
+        rc = findnext(fileinfo.Filename);
     }
-    LbFileFindEnd(&fileinfo);
+    findclose();
     LbMemoryFree(buf);
+
     return result;
 }
 

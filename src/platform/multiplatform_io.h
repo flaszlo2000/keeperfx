@@ -1,5 +1,3 @@
-#include <time.h>
-
 #ifndef MULTIPLATFORM_IO
 #define MULTIPLATFORM_IO
 
@@ -17,19 +15,6 @@
     #define _lseeki64 lseek64
     #define _lseek lseek
     #define stricmp strcasecmp
-
-    //! FIXME
-    #define _MAX_FNAME 300
-
-    typedef struct _finddata_t {
-        unsigned attrib;
-        time_t time_create;
-        time_t time_access;
-        time_t time_write;
-        long long size; // ?
-        char name[_MAX_FNAME];
-    };
-
 #endif
 
 #endif

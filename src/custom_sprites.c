@@ -34,6 +34,8 @@
 #include <json-dom.h>
 #include "post_inc.h"
 
+#include "platform/file_iterator/file_iterator.h"
+
 // Performance tests
 // #define OUTER
 // #define INNER
@@ -231,15 +233,19 @@ static int cmp_named_command(const void *a, const void *b)
 static void load_system_sprites(short fgroup)
 {
     SYNCDBG(8, "Starting");
+
     struct TbFileFind fileinfo;
     int cnt = 0, cnt_ok = 0, cnt_icons = 0;
-    char *fname = prepare_file_path(fgroup, "*.zip");
+
+    char *dirPath = prepare_file_path(fgroup, "");
     const char *path;
-    if (0 == *fname) // No campaign
+
+    if (0 == *dirPath) // No campaign
         return;
-    for (int rc = LbFileFindFirst(fname, &fileinfo, 0x21u);
-         rc != -1;
-         rc = LbFileFindNext(&fileinfo))
+
+    for (int rc = findfirst(dirPath, ".zip", fileinfo.Filename);
+         rc > 0;
+         rc = findnext(fileinfo.Filename))
     {
         path = prepare_file_path(fgroup, fileinfo.Filename);
 #ifdef OUTER
@@ -259,6 +265,8 @@ static void load_system_sprites(short fgroup)
         }
         cnt++;
     }
+    findclose();
+
     LbJustLog("Found %d sprite zip file(s), loaded %d with animations and %d with icons. Used %d/%d sprite slots.\n", cnt, cnt_ok, cnt_icons, next_free_sprite, KEEPERSPRITE_ADD_NUM);
 }
 

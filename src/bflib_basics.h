@@ -93,17 +93,9 @@ typedef int TbFileHandle;
 typedef unsigned char TbBool;
 typedef short TbScreenPos;
 
+
 struct TbFileFind {
-          char Filename[144];
-        //   char AlternateFilename[14];
-        //   unsigned long Attributes;
-        //   unsigned long Length;
-        //   struct TbDate CreationDate;
-        //   struct TbTime CreationTime;
-        //   struct TbDate LastWriteDate;
-        //   struct TbTime LastWriteTime;
-          unsigned long ReservedHandle;
-          struct _finddata_t Reserved;
+        char Filename[144];
 };
 
 #define LOG_PREFIX_LEN 32

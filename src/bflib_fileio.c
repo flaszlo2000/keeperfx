@@ -80,9 +80,6 @@ WINBASEAPI DWORD WINAPI GetLastError(void);
 #endif
 #endif
 /******************************************************************************/
-//Internal declarations
-void convert_find_info(struct TbFileFind *ffind);
-/******************************************************************************/
 
 short LbFileExists(const char *fname)
 {
@@ -301,74 +298,6 @@ long LbFileLength(const char *fname)
         LbFileClose(handle);
   }
   return result;
-}
-
-//Converts file search information from platform-specific into independent form
-//Yeah, right...
-void convert_find_info(struct TbFileFind *ffind)
-{
-  struct _finddata_t *fdata=&(ffind->Reserved);
-  snprintf(ffind->Filename,144, "%s", fdata->name);
-// #if defined(_WIN32)
-//   GetShortPathName(fdata->name,ffind->AlternateFilename,14);
-// #else
-//   strncpy(ffind->AlternateFilename,fdata->name,14);
-// #endif
-//   ffind->AlternateFilename[13]='\0';
-//   if (fdata->size>ULONG_MAX)
-//     ffind->Length=ULONG_MAX;
-//   else
-//     ffind->Length = fdata->size;
-//   ffind->Attributes = fdata->attrib;
-//   LbDateTimeDecode(&fdata->time_create,&ffind->CreationDate,&ffind->CreationTime);
-//   LbDateTimeDecode(&fdata->time_write,&ffind->LastWriteDate,&ffind->LastWriteTime);
-}
-
-// returns -1 if no match is found. Otherwise returns 1 and stores a handle
-// to be used in _findnext and _findclose calls inside TbFileFind struct.
-int LbFileFindFirst(const char *filespec, struct TbFileFind *ffind,unsigned int attributes)
-{
-    // original Watcom code was
-    //dos_findfirst_(path, attributes,&(ffind->Reserved))
-    //The new code skips 'attributes' as Win32 prototypes seem not to use them
-    ffind->ReservedHandle = _findfirst(filespec,&(ffind->Reserved));
-    int result;
-    if (ffind->ReservedHandle == -1)
-    {
-      result = -1;
-    } else
-    {
-      convert_find_info(ffind);
-      result = 1;
-    }
-    return result;
-}
-
-// returns -1 if no match is found, otherwise returns 1
-int LbFileFindNext(struct TbFileFind *ffind)
-{
-    int result;
-    if ( _findnext(ffind->ReservedHandle,&(ffind->Reserved)) < 0 )
-    {
-        _findclose(ffind->ReservedHandle);
-        ffind->ReservedHandle = -1;
-        result = -1;
-    } else
-    {
-        convert_find_info(ffind);
-        result = 1;
-    }
-    return result;
-}
-
-//Ends file searching sequence
-int LbFileFindEnd(struct TbFileFind *ffind)
-{
-    if (ffind->ReservedHandle != -1)
-    {
-        _findclose(ffind->ReservedHandle);
-    }
-    return 1;
 }
 
 //Removes a disk file
