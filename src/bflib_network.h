@@ -20,7 +20,11 @@
 #ifndef BFLIB_NETWRK_H
 #define BFLIB_NETWRK_H
 
+//! FIXME
+#ifndef __linux__
 #include <basetyps.h>
+#endif
+
 #include "bflib_basics.h"
 #include "globals.h"
 

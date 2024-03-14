@@ -30,7 +30,7 @@ ifneq (,$(findstring Windows,$(OS)))
   # "-Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive
 else
   CROSS_EXEEXT =
-  CROSS_COMPILE = i686-w64-mingw32-
+  CROSS_COMPILE =
   LINKFLAGS = -static-libgcc -static-libstdc++ -Wl,--enable-auto-import
 endif
 # Executable files extension on target environment
@@ -607,7 +607,7 @@ libexterns: libexterns.mk
 clean-libexterns: libexterns.mk
 	-$(MAKE) -f libexterns.mk clean-libexterns
 	-$(MAKE) -f enet.mk clean
-	-cd deps/zlib && $(MAKE) -f win32/Makefile.gcc clean
+	-cd deps/zlib && $(MAKE) -f Makefile clean
 	-cd deps/zlib && git checkout Makefile zconf.h
 	-$(RM) libexterns
 

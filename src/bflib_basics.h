@@ -20,7 +20,9 @@
 #ifndef BFLIB_BASICS_H
 #define BFLIB_BASICS_H
 
-#include <io.h>
+#include "platform/multiplatform_io.h"
+
+
 #include <time.h>
 
 #ifdef __cplusplus
@@ -93,13 +95,13 @@ typedef short TbScreenPos;
 
 struct TbFileFind {
           char Filename[144];
-          char AlternateFilename[14];
-          unsigned long Attributes;
-          unsigned long Length;
-          struct TbDate CreationDate;
-          struct TbTime CreationTime;
-          struct TbDate LastWriteDate;
-          struct TbTime LastWriteTime;
+        //   char AlternateFilename[14];
+        //   unsigned long Attributes;
+        //   unsigned long Length;
+        //   struct TbDate CreationDate;
+        //   struct TbTime CreationTime;
+        //   struct TbDate LastWriteDate;
+        //   struct TbTime LastWriteTime;
           unsigned long ReservedHandle;
           struct _finddata_t Reserved;
 };

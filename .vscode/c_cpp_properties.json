@@ -3,15 +3,15 @@
         {
             "name": "MinGW",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/usr/include/x86_64-linux-gnu",
+                "${workspaceFolder}/sdl/include/SDL2"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/i686-w64-mingw32-gcc",
+            "compilerPath": "/usr/bin/gcc",
             "cStandard": "c17",
             "cppStandard": "gnu++17",
-            "intelliSenseMode": "windows-gcc-x86",
-            //"configurationProvider": "ms-vscode.makefile-tools",
-            //"compileCommands": "${workspaceFolder}/compile_commands.json",
+            "intelliSenseMode": "windows-gcc-x86"
         }
     ],
     "version": 4

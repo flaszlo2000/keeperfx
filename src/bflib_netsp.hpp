@@ -20,7 +20,11 @@
 #ifndef BFLIB_NETSP_H
 #define BFLIB_NETSP_H
 
+//! FIXME
+#ifndef __linux__
 #include <basetyps.h>
+#endif
+
 #include "bflib_basics.h"
 #include "bflib_netsession.h"
 

@@ -26,12 +26,17 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <io.h>
+#include "platform/multiplatform_io.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <limits.h>
 #include <time.h>
+
+#ifndef __linux__
 #include <share.h>
+#else
+#include "bflib_dernc.h"
+#endif
 
 #include "bflib_basics.h"
 #include "bflib_datetm.h"
@@ -86,7 +91,7 @@ short LbFileExists(const char *fname)
 
 int LbFilePosition(TbFileHandle handle)
 {
-  int result = tell(handle);
+  int result = ftell(handle);
   return result;
 }
 
@@ -99,7 +104,7 @@ int create_directory_for_file(const char * fname)
   while (separator != NULL) {
     memcpy(tmp, fname, separator - fname);
     tmp[separator - fname] = 0;
-    if (_mkdir(tmp) != 0) {
+    if (mkdir(tmp, 0777) != 0) {
       if (errno != EEXIST) {
         free(tmp);
         return 0;
@@ -145,7 +150,9 @@ TbFileHandle LbFileOpen(const char *fname, const unsigned char accmode)
       LbSyncLog("LbFileOpen: LBO_CREAT mode\n");
 #endif
         if (create_directory_for_file(fname)) {
-          rc = _sopen(fname, O_RDWR|O_CREAT|O_BINARY, SH_DENYNO, S_IREAD|S_IWRITE);
+          //! FIXME
+          //rc = _sopen(fname, O_RDWR|O_CREAT|O_BINARY, SH_DENYNO, S_IREAD|S_IWRITE);
+          rc = _open(fname, O_RDWR|O_CREAT);
         }
     };break;
   case Lb_FILE_MODE_OLD:
@@ -153,14 +160,18 @@ TbFileHandle LbFileOpen(const char *fname, const unsigned char accmode)
 #ifdef __DEBUG
         LbSyncLog("LbFileOpen: LBO_RDWR mode\n");
 #endif
-        rc = _sopen(fname, O_RDWR|O_BINARY, SH_DENYNO);
+        //! FIXME
+        //rc = _sopen(fname, O_RDWR|O_BINARY, SH_DENYNO);
+        rc = _open(fname, O_RDWR);
     };break;
   case Lb_FILE_MODE_READ_ONLY:
     {
 #ifdef __DEBUG
         LbSyncLog("LbFileOpen: LBO_RDONLY mode\n");
 #endif
-        rc = _sopen(fname, O_RDONLY|O_BINARY, SH_DENYNO);
+        //! FIXME
+        //rc = _sopen(fname, O_RDONLY|O_BINARY, SH_DENYNO);
+        rc = _open(fname, O_RDONLY);
     };break;
   }
 #ifdef __DEBUG
@@ -265,7 +276,9 @@ short LbFileFlush(TbFileHandle handle)
 #else
   // For normal POSIX systems
   // (should also work on Win, as its IEEE standard... but it currently isn't)
-  return (ioctl(handle,I_FLUSH,FLUSHRW) != -1);
+  //! FIXME, find out how to flush file based on fd
+  return 0;
+  //return (ioctl(handle,I_FLUSH,FLUSHRW) != -1);
 #endif
 #endif
 
@@ -273,7 +286,7 @@ short LbFileFlush(TbFileHandle handle)
 
 long LbFileLengthHandle(TbFileHandle handle)
 {
-    long result = filelength(handle);
+    long result = LbFileLengthRnc(handle);
     return result;
 }
 
@@ -284,7 +297,7 @@ long LbFileLength(const char *fname)
     long result = handle;
     if (handle != -1)
     {
-        result = filelength(handle);
+        result = LbFileLengthRnc(handle);
         LbFileClose(handle);
   }
   return result;
@@ -296,19 +309,19 @@ void convert_find_info(struct TbFileFind *ffind)
 {
   struct _finddata_t *fdata=&(ffind->Reserved);
   snprintf(ffind->Filename,144, "%s", fdata->name);
-#if defined(_WIN32)
-  GetShortPathName(fdata->name,ffind->AlternateFilename,14);
-#else
-  strncpy(ffind->AlternateFilename,fdata->name,14);
-#endif
-  ffind->AlternateFilename[13]='\0';
-  if (fdata->size>ULONG_MAX)
-    ffind->Length=ULONG_MAX;
-  else
-    ffind->Length = fdata->size;
-  ffind->Attributes = fdata->attrib;
-  LbDateTimeDecode(&fdata->time_create,&ffind->CreationDate,&ffind->CreationTime);
-  LbDateTimeDecode(&fdata->time_write,&ffind->LastWriteDate,&ffind->LastWriteTime);
+// #if defined(_WIN32)
+//   GetShortPathName(fdata->name,ffind->AlternateFilename,14);
+// #else
+//   strncpy(ffind->AlternateFilename,fdata->name,14);
+// #endif
+//   ffind->AlternateFilename[13]='\0';
+//   if (fdata->size>ULONG_MAX)
+//     ffind->Length=ULONG_MAX;
+//   else
+//     ffind->Length = fdata->size;
+//   ffind->Attributes = fdata->attrib;
+//   LbDateTimeDecode(&fdata->time_create,&ffind->CreationDate,&ffind->CreationTime);
+//   LbDateTimeDecode(&fdata->time_write,&ffind->LastWriteDate,&ffind->LastWriteTime);
 }
 
 // returns -1 if no match is found. Otherwise returns 1 and stores a handle

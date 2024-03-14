@@ -21,6 +21,8 @@
 #include "bflib_crash.h"
 #include <signal.h>
 #include <stdarg.h>
+
+#ifndef __linux__
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -28,6 +30,8 @@
 #include <imagehlp.h>
 #include <dbghelp.h>
 #include <psapi.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -98,6 +102,7 @@ void ctrl_handler(int sig_id)
     raise(sig_id);
 }
 
+#ifndef __linux__
 static void
 _backtrace(int depth , LPCONTEXT context)
 {
@@ -311,6 +316,7 @@ static LONG CALLBACK ctrl_handler_w32(LPEXCEPTION_POINTERS info)
     LbErrorLogClose();
     return EXCEPTION_EXECUTE_HANDLER;
 }
+#endif
 
 void LbErrorParachuteInstall(void)
 {
@@ -328,11 +334,11 @@ void LbErrorParachuteInstall(void)
     signal(SIGBREAK,ctrl_handler);
 #endif
     atexit(exit_handler);
-    SetUnhandledExceptionFilter(ctrl_handler_w32);
+    //SetUnhandledExceptionFilter(ctrl_handler_w32);
 }
 
 void LbErrorParachuteUpdate(void)
 {
-    SetUnhandledExceptionFilter(ctrl_handler_w32);
+    //SetUnhandledExceptionFilter(ctrl_handler_w32);
 }
 /******************************************************************************/
