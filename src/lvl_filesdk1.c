@@ -645,7 +645,7 @@ TbBool find_and_load_lof_files(void)
     char *dirPath = prepare_file_path(FGrp_CmpgLvls, "");
     int rc = findfirst(dirPath, ".lof", fileinfo.Filename);
 
-    while (rc != -1)
+    while (rc)
     {
         dirPath = prepare_file_path(FGrp_CmpgLvls,fileinfo.Filename);
         long i = LbFileLength(dirPath);
