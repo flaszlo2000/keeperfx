@@ -51,9 +51,7 @@ int LbFileRead(TbFileHandle handle, void *buffer, unsigned long len);
 long LbFileWrite(TbFileHandle handle, const void *buffer, const unsigned long len);
 long LbFileLength(const char *fname);
 long LbFileLengthHandle(TbFileHandle handle);
-int LbFileFindFirst(const char *filespec, struct TbFileFind *ffind,unsigned int attributes);
-int LbFileFindNext(struct TbFileFind *ffind);
-int LbFileFindEnd(struct TbFileFind *ffind);
+// TODO put platform independent file iterator here
 int LbFileDelete(const char *filename);
 short LbFileFlush(TbFileHandle handle);
 int LbFileMakeFullPath(const short append_cur_dir,

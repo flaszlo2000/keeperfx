@@ -12,8 +12,11 @@
  */
 /******************************************************************************/
 #include "pre_inc.h"
+
+#ifndef __linux__
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 
 #include "keeperfx.hpp"
 
@@ -1043,11 +1046,12 @@ TbBool initial_setup(void)
  */
 short setup_game(void)
 {
-  struct CPU_INFO cpu_info; // CPU status variable
   short result;
+  struct CPU_INFO cpu_info; // CPU status variable
+  cpu_detect(&cpu_info);
+#ifndef __linux__
   OSVERSIONINFO v;
   // Do only a very basic setup
-  cpu_detect(&cpu_info);
   SYNCMSG("CPU %s type %d family %d model %d stepping %d features %08x",cpu_info.vendor,
       (int)cpu_get_type(&cpu_info),(int)cpu_get_family(&cpu_info),(int)cpu_get_model(&cpu_info),
       (int)cpu_get_stepping(&cpu_info),cpu_info.feature_edx);
@@ -1061,6 +1065,7 @@ short setup_game(void)
   {
       SYNCMSG("Operating System: %s %ld.%ld.%ld", (v.dwPlatformId == VER_PLATFORM_WIN32_NT) ? "Windows NT" : "Windows", v.dwMajorVersion,v.dwMinorVersion,v.dwBuildNumber);
   }
+#endif
 
   // Check for Wine
   #ifdef _WIN32
@@ -4389,6 +4394,7 @@ void get_cmdln_args(unsigned short &argc, char *argv[])
     }
 }
 
+#ifndef __linux__
 LONG __stdcall Vex_handler(
     _EXCEPTION_POINTERS *ExceptionInfo
 )
@@ -4397,12 +4403,13 @@ LONG __stdcall Vex_handler(
     LbCloseLog();
     return 0;
 }
+#endif
 
 int main(int argc, char *argv[])
 {
   char *text;
 
-  AddVectoredExceptionHandler(0, &Vex_handler);
+  //AddVectoredExceptionHandler(0, &Vex_handler); // FIXME
   get_cmdln_args(bf_argc, bf_argv);
 
   try {

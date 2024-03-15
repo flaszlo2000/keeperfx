@@ -149,7 +149,7 @@ TbFileHandle LbFileOpen(const char *fname, const unsigned char accmode)
         if (create_directory_for_file(fname)) {
           //! FIXME
           //rc = _sopen(fname, O_RDWR|O_CREAT|O_BINARY, SH_DENYNO, S_IREAD|S_IWRITE);
-          rc = _open(fname, O_RDWR|O_CREAT);
+          rc = _open(fname, O_RDWR|O_CREAT, 0700);
         }
     };break;
   case Lb_FILE_MODE_OLD:

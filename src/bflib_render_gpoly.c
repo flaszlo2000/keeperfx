@@ -533,8 +533,8 @@ void draw_gpoly(struct PolyPoint *point_a, struct PolyPoint *point_b, struct Pol
     case 98:
     case 101:
     case 102:
-        draw_gpoly_sub1a();
-        draw_gpoly_sub1b();
+        //draw_gpoly_sub1a();
+        //draw_gpoly_sub1b();
         draw_gpoly_sub1c();
         break;
     case 28:
@@ -549,8 +549,8 @@ void draw_gpoly(struct PolyPoint *point_a, struct PolyPoint *point_b, struct Pol
     case 100:
     case 103:
     case 104:
-        draw_gpoly_sub2a();
-        draw_gpoly_sub2b();
+        //draw_gpoly_sub2a();
+        //draw_gpoly_sub2b();
         draw_gpoly_sub2c();
         break;
     case 4:
@@ -559,8 +559,9 @@ void draw_gpoly(struct PolyPoint *point_a, struct PolyPoint *point_b, struct Pol
     case 68:
     case 80:
     case 81:
-        draw_gpoly_sub3a();
-        draw_gpoly_sub3b();
+        draw_gpoly_sub1c();
+        //draw_gpoly_sub3a();
+        //draw_gpoly_sub3b();
         break;
     case 3:
     case 12:
@@ -576,11 +577,13 @@ void draw_gpoly(struct PolyPoint *point_a, struct PolyPoint *point_b, struct Pol
     case 83:
     case 86:
     case 87:
-        draw_gpoly_sub4();
+        draw_gpoly_sub1c();
+        //draw_gpoly_sub4();
         break;
     case 2:
     case 66:
-        draw_gpoly_sub5();
+        draw_gpoly_sub1c();
+        //draw_gpoly_sub5();
         break;
     case 5:
     case 6:
@@ -593,10 +596,12 @@ void draw_gpoly(struct PolyPoint *point_a, struct PolyPoint *point_b, struct Pol
     case 85:
     case 88:
     case 89:
-        draw_gpoly_sub6();
+        draw_gpoly_sub1c();
+        //draw_gpoly_sub6();
         break;
     case 69:
-        draw_gpoly_sub7();
+        draw_gpoly_sub1c();
+        //draw_gpoly_sub7();
         break;
     case 43:
     case 44:
@@ -644,10 +649,12 @@ void draw_gpoly(struct PolyPoint *point_a, struct PolyPoint *point_b, struct Pol
                 gploc_12C = factor_ba;
                 gploc_128 = factor_ca;
             }
-            draw_gpoly_sub11();
+            draw_gpoly_sub1c();
+            //draw_gpoly_sub11();
         } else // not exceeds_window
         {
-            draw_gpoly_sub12();
+            draw_gpoly_sub1c();
+            //draw_gpoly_sub12();
         }
         break;
 
@@ -669,7 +676,8 @@ void draw_gpoly(struct PolyPoint *point_a, struct PolyPoint *point_b, struct Pol
                 gploc_12C = factor_ba;
                 gploc_128 = factor_ca;
             }
-            draw_gpoly_sub13();
+            draw_gpoly_sub1c();
+            //draw_gpoly_sub13();
         } else // not exceeds_window
         {
             gploc_104 = LOC_vec_screen_width;
@@ -686,7 +694,8 @@ void draw_gpoly(struct PolyPoint *point_a, struct PolyPoint *point_b, struct Pol
                 gploc_12C = factor_ba;
                 gploc_128 = factor_ca;
             }
-            draw_gpoly_sub14();
+            draw_gpoly_sub1c();
+            //draw_gpoly_sub14();
         }
         break;
     }
@@ -744,6 +753,7 @@ static void unk_update_gpoly1_tri16b(long * vout0, long * vout1, long * vout2, l
     *vout0 = tmp1;
 }
 
+#if 0
 void draw_gpoly_sub1a()
 {
 #if __GNUC__
@@ -836,7 +846,9 @@ gpo_loc_05C8:         # 3C6\n \
 " : : : "memory", "cc");
 #endif
 }
+#endif
 
+#if 0
 void draw_gpoly_sub1b()
 {
 #if __GNUC__
@@ -1020,6 +1032,7 @@ gpo_loc_07B0:         # 520\n \
 " : : : "memory", "cc");
 #endif
 }
+#endif
 
 void draw_gpoly_sub1c()
 {
@@ -1044,6 +1057,7 @@ void draw_gpoly_sub1c()
     }
 }
 
+#if 0
 void draw_gpoly_sub2a()
 {
 #if __GNUC__
@@ -1373,6 +1387,7 @@ gpo_loc_0CB0:         # A07\n \
 " : : : "memory", "cc");
 #endif
 }
+#endif
 
 void draw_gpoly_sub2c()
 {
@@ -1400,6 +1415,7 @@ void draw_gpoly_sub2c()
 
 }
 
+#if 0
 void draw_gpoly_sub3a()
 {
 #if __GNUC__
@@ -4998,5 +5014,5 @@ locret69b:\n \
 " : : : "memory", "cc");
 #endif
 }
-
+#endif
 /******************************************************************************/

@@ -105,7 +105,7 @@ void gtblock_draw(struct GtBlock *gtb)
     LOC_gtblock_clip_height = gtblock_clip_height;
     LOC_gtblock_screen_width = gtblock_screen_width;
 
-#if __GNUC__
+#if 0
     asm volatile (" \
 var_44  =   -0x44\n \
 var_40  =   -0x40\n \
