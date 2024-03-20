@@ -17,3 +17,5 @@
 ### fixed stuff
 - `_findfirst, _findnext, _findclose`: heavy Win dependency but it's just a file iterator. Made my own in the `platform` folder.  
 (Lets not mention that I even discovered a memory leak with one of the functions using them AND the fact `stuct TbFileFind` had like 13 parameters but only used **3** (where two were just handles)... and even had converters and a bunch of dead code surrounding it.)
+
+- Replaced `bflib_semphr` with SDL semaphore. This way, we don't have to roll our own (platform independent) implementation.
