@@ -141,8 +141,8 @@ void LbI_PointerHandler::SetHotspot(long x, long y)
 {
     long prev_x;
     long prev_y;
-    LbSemaLock semlock(&sema_rel,0);
-    semlock.Lock(true);
+    SDL_SemWait(this->semaphore);
+
     if (this->field_1050)
     {
         // Set new coords, and backup previous ones
@@ -195,8 +195,9 @@ void LbI_PointerHandler::Initialise(const struct TbSprite *spr, struct TbPoint *
     int dstwidth;
     int dstheight;
     Release();
-    LbSemaLock semlock(&sema_rel,0);
-    semlock.Lock(true);
+
+    SDL_SemWait(this->semaphore);
+
     sprite = spr;
     dstwidth = scale_ui_value_lofi(sprite->SWidth + 1);
     dstheight = scale_ui_value_lofi(sprite->SHeight + 1);
@@ -257,8 +258,8 @@ void LbI_PointerHandler::Undraw(bool a1)
 
 void LbI_PointerHandler::Release(void)
 {
-    LbSemaLock semlock(&sema_rel,0);
-    semlock.Lock(true);
+    SDL_SemWait(this->semaphore);
+
     if ( this->field_1050 )
     {
         if ( lbInteruptMouse )
@@ -304,9 +305,10 @@ void LbI_PointerHandler::NewMousePos(void)
 
 bool LbI_PointerHandler::OnMove(void)
 {
-    LbSemaLock semlock(&sema_rel,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
         return false;
+    }
+
     if (lbPointerAdvancedDraw && lbInteruptMouse)
     {
         Undraw(true);
@@ -317,31 +319,34 @@ bool LbI_PointerHandler::OnMove(void)
     {
         NewMousePos();
     }
+
     return true;
 }
 
 void LbI_PointerHandler::OnBeginPartialUpdate(void)
 {
-    LbSemaLock semlock(&sema_rel,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
         return;
+    }
+
     Backup(false);
     Draw(false);
 }
 
 void LbI_PointerHandler::OnEndPartialUpdate(void)
 {
-    LbSemaLock semlock(&sema_rel,1);
     Undraw(false);
     this->field_1054 = true;
-    semlock.Release();
+
+    SDL_SemPost(this->semaphore);
 }
 
 void LbI_PointerHandler::OnBeginSwap(void)
 {
-    LbSemaLock semlock(&sema_rel,0);
-    if (!semlock.Lock(true))
-      return;
+    if(SDL_SemWait(this->semaphore) < 0) {
+        return;
+    }
+
     if ( lbPointerAdvancedDraw )
     {
         Backup(false);
@@ -357,28 +362,28 @@ void LbI_PointerHandler::OnBeginSwap(void)
 
 void LbI_PointerHandler::OnEndSwap(void)
 {
-    LbSemaLock semlock(&sema_rel,1);
     if ( lbPointerAdvancedDraw )
     {
         Undraw(false);
         this->field_1054 = true;
     }
-    semlock.Release();
+
+    SDL_SemPost(this->semaphore);
 }
 
 void LbI_PointerHandler::OnBeginFlip(void)
 {
-    LbSemaLock semlock(&sema_rel,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
         return;
+    }
+
     Backup(false);
     Draw(false);
 }
 
 void LbI_PointerHandler::OnEndFlip(void)
 {
-    LbSemaLock semlock(&sema_rel,1);
-    semlock.Release();
+    SDL_SemPost(this->semaphore);
 }
 
 /******************************************************************************/

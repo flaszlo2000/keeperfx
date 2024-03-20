@@ -21,7 +21,6 @@
 #define BFLIB_MSPOINTER_H
 
 #include "bflib_basics.h"
-#include "bflib_semphr.hpp"
 #include "bflib_planar.h"
 #include "bflib_vidsurface.h"
 #include "bflib_video.h"
@@ -66,8 +65,8 @@ class LbI_PointerHandler {
     bool field_1050;
     bool field_1054;
     const struct TbSprite *sprite;
-    LbSemaphore sema_rel;
-    };
+    SDL_sem * semaphore;
+};
 
 /******************************************************************************/
 

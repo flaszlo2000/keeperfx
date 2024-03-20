@@ -54,6 +54,7 @@ MouseStateHandler::MouseStateHandler(void)
 
 MouseStateHandler::~MouseStateHandler(void)
 {
+  SDL_DestroySemaphore(this->semaphore);
 }
 
 bool MouseStateHandler::Install(void)
@@ -64,26 +65,27 @@ bool MouseStateHandler::Install(void)
 
 bool MouseStateHandler::IsInstalled(void)
 {
-    LbSemaLock semlock(&semaphore,0);
-    if (!semlock.Lock(true))
-      return false;
-    return true;
+    return SDL_SemWait(this->semaphore) == 0;
 }
 
 bool MouseStateHandler::Release(void)
 {
-    LbSemaLock semlock(&semaphore,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
       return false;
+    }
+
     lbMouseInstalled = false;
     lbDisplay.MouseSprite = NULL;
     this->installed = false;
     mssprite = NULL;
+
     pointer.Release();
+
     mspos.x = 0;
     mspos.y = 0;
     hotspot.x = 0;
     hotspot.y = 0;
+
     return true;
 }
 
@@ -96,24 +98,16 @@ struct TbPoint *MouseStateHandler::GetPosition(void)
 
 bool MouseStateHandler::SetMousePosition(long x, long y)
 {
-    long mx;
-    long my;
-    LbSemaLock semlock(&semaphore,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
       return false;
+    }
+
     if (!this->SetPosition(x, y))
       return false;
-    if ( this->installed )
-    {
-      mx = mspos.x;
-      my = mspos.y;
-    } else
-    {
-      mx = x;
-      my = y;
-    }
-    lbDisplay.MMouseX = mx;
-    lbDisplay.MMouseY = my;
+
+    lbDisplay.MMouseX = this->installed ? mspos.x : x;
+    lbDisplay.MMouseY = this->installed ? mspos.y : y;
+
     return true;
 }
 
@@ -167,27 +161,31 @@ bool MouseStateHandler::SetPosition(long x, long y)
 
 bool MouseStateHandler::SetMouseWindow(long x, long y,long width, long height)
 {
-    LbSemaLock semlock(&semaphore,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
       return false;
+    }
+
     lbDisplay.MouseWindowX = x;
     lbDisplay.MouseWindowY = y;
     lbDisplay.MouseWindowWidth = width;
     lbDisplay.MouseWindowHeight = height;
     adjust_point(&lbDisplay.MMouseX, &lbDisplay.MMouseY);
     adjust_point(&lbDisplay.MouseX, &lbDisplay.MouseY);
+
     return true;
 }
 
 bool MouseStateHandler::GetMouseWindow(struct TbRect *windowRect)
 {
-    LbSemaLock semlock(&semaphore,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
       return false;
+    }
+
     windowRect->left = lbDisplay.MouseWindowX;
     windowRect->top = lbDisplay.MouseWindowY;
     windowRect->right = lbDisplay.MouseWindowX+lbDisplay.MouseWindowWidth;
     windowRect->bottom = lbDisplay.MouseWindowY+lbDisplay.MouseWindowHeight;
+
     return true;
 }
 
@@ -227,12 +225,15 @@ bool MouseStateHandler::SetPointer(const struct TbSprite *spr, struct TbPoint *p
 
 bool MouseStateHandler::SetMousePointerAndOffset(const struct TbSprite *mouseSprite, long x, long y)
 {
-    struct TbPoint point;
-    LbSemaLock semlock(&semaphore,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
       return false;
+    }
+    
+    struct TbPoint point;
+    
     if (mouseSprite == lbDisplay.MouseSprite)
       return true;
+    
     if (mouseSprite != NULL)
     {
         if ((mouseSprite->SWidth > 64) || (mouseSprite->SHeight > 64))
@@ -241,37 +242,45 @@ bool MouseStateHandler::SetMousePointerAndOffset(const struct TbSprite *mouseSpr
             return false;
         }
     }
+    
     lbDisplay.MouseSprite = mouseSprite;
     point.x = x;
     point.y = y;
+    
     return this->SetPointer(mouseSprite, &point);
 }
 
 bool MouseStateHandler::SetMousePointer(const struct TbSprite *mouseSprite)
 {
-    LbSemaLock semlock(&semaphore,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
       return false;
+    }
+
     if (mouseSprite == lbDisplay.MouseSprite)
       return true;
+
     if (mouseSprite != NULL)
       if ( (mouseSprite->SWidth > 64) || (mouseSprite->SHeight > 64) )
       {
         WARNLOG("Mouse pointer too large");
         return false;
       }
+
     lbDisplay.MouseSprite = mouseSprite;
     this->SetPointer(mouseSprite, NULL);
+
     return true;
 }
 
 bool MouseStateHandler::SetPointerOffset(long x, long y)
 {
-    LbSemaLock semlock(&semaphore,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
       return false;
+    }
+
     if (this->installed)
       pointer.SetHotspot(x, y);
+
     return true;
 }
 
@@ -282,24 +291,27 @@ struct TbPoint *MouseStateHandler::GetPointerOffset(void)
 
 bool MouseStateHandler::PointerBeginSwap(void)
 {
-    LbSemaLock semlock(&semaphore,0);
-    if (!semlock.Lock(true))
+    if(SDL_SemWait(this->semaphore) < 0) {
       return false;
+    }
+
     if ((!lbMouseInstalled) || (lbMouseOffline))
       return true;
+
     if ((mssprite != NULL) && (this->installed))
     {
       swap = 1;
       pointer.OnBeginSwap();
     }
+
     return true;
 }
 
 bool MouseStateHandler::PointerEndSwap(void)
 {
-    LbSemaLock semlock(&semaphore,1);
     if (!lbMouseInstalled)
       return true;
+
     if ((mssprite != NULL) && (this->installed))
     {
       if (swap)
@@ -308,7 +320,8 @@ bool MouseStateHandler::PointerEndSwap(void)
         pointer.OnEndSwap();
       }
     }
-    semlock.Release();
+
+    SDL_SemPost(this->semaphore);
     return true;
 }
 /******************************************************************************/

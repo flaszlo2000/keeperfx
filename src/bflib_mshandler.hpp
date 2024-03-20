@@ -50,7 +50,7 @@ class MouseStateHandler {
  protected:
     bool SetPointer(const struct TbSprite *spr, struct TbPoint *pt);
     // Properties
-    LbSemaphore semaphore;
+    SDL_sem * semaphore;
     bool installed;
     const struct TbSprite *mssprite;
     struct TbPoint mspos;
