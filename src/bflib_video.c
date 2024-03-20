@@ -26,6 +26,11 @@
 #include "bflib_sprfnt.h"
 #include "bflib_vidsurface.h"
 
+#ifdef __linux__
+#undef SDL_VIDEO_DRIVER_WINDOWS
+#define SDL_VIDEO_DRIVER_X11 1
+#endif
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 #include <math.h>

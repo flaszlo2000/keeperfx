@@ -34,6 +34,10 @@
 #include "game_legacy.h"
 #include "post_inc.h"
 
+#ifdef __linux__
+#define sprintf_s(buf, ...) snprintf((buf), sizeof(buf), __VA_ARGS__)
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

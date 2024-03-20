@@ -4352,7 +4352,7 @@ void get_cmdln_args(unsigned short &argc, char *argv[])
 {
     char *ptr;
     const char *cmndln_orig;
-    cmndln_orig = GetCommandLineA();
+    cmndln_orig = ""; //GetCommandLineA();
     snprintf(cmndline, CMDLN_MAXLEN, "%s", cmndln_orig);
     ptr = cmndline;
     bf_argc = 0;

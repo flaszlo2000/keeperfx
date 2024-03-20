@@ -31,10 +31,10 @@ ifneq (,$(findstring Windows,$(OS)))
 else
   CROSS_EXEEXT =
   CROSS_COMPILE =
-  LINKFLAGS = -static-libgcc -static-libstdc++ -Wl,--enable-auto-import
+  LINKFLAGS = -static-libgcc -static-libstdc++
 endif
 # Executable files extension on target environment
-EXEEXT = .exe
+EXEEXT =
 # Names of utility commands
 CPP      = $(CROSS_COMPILE)g++
 CC       = $(CROSS_COMPILE)gcc
@@ -63,8 +63,8 @@ TEST_BIN = bin/tests$(EXEEXT)
 HVLOGBIN = bin/keeperfx_hvlog$(EXEEXT)
 # Names of intermediate build products
 GENSRC   = obj/ver_defs.h
-RES      = obj/keeperfx_stdres.res
-LIBS     = obj/enet.a
+RES      = #obj/keeperfx_stdres.res
+LIBS     = #obj/enet.a
 
 DEPS = \
 obj/spng.o \
@@ -109,7 +109,6 @@ obj/bflib_cpu.o \
 obj/bflib_crash.o \
 obj/bflib_datetm.o \
 obj/bflib_dernc.o \
-obj/bflib_enet.o \
 obj/bflib_fileio.o \
 obj/bflib_filelst.o \
 obj/bflib_fmvids.o \
@@ -336,8 +335,7 @@ MAIN_OBJ = obj/main.o
 TESTS_OBJ = obj/tests/tst_main.o \
 obj/tests/tst_fixes.o \
 obj/tests/001_test.o \
-obj/tests/tst_enet_server.o \
-obj/tests/tst_enet_client.o
+
 
 CU_DIR = deps/CUnit-2.1-3/CUnit
 CU_INC = -I"$(CU_DIR)/Headers"
@@ -349,10 +347,10 @@ CU_OBJS = \
 	obj/cu/Util.o
 
 # include and library directories
-LINKLIB =  -L"sdl/lib" -mwindows obj/enet.a \
-	-lwinmm -lmingw32 -limagehlp -lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_net -lSDL2_image \
-	-L"deps/zlib" -lz -lws2_32 -ldbghelp
-INCS =  -I"sdl/include" -I"sdl/include/SDL2" -I"deps/enet/include" -I"deps/centijson/src" -I"deps/centitoml"
+LINKLIB =  -L"sdl/lib" \
+	-lSDL2main -lSDL2 -lSDL2_mixer -lSDL2_image \
+	-L"deps/zlib" -lz
+INCS =  -I"sdl/include" -I"sdl/include/SDL2" -I"deps/centijson/src" -I"deps/centitoml"
 CXXINCS =  $(INCS)
 
 STDOBJS   = $(subst obj/,obj/std/,$(OBJS))
@@ -367,7 +365,7 @@ ENABLE_EXTRACT ?= 1
 # flags to generate dependency files
 DEPFLAGS = -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -DSPNG_STATIC=1
 # other flags to include while compiling
-INCFLAGS =
+INCFLAGS = -Wno-absolute-value
 # code optimization and debugging flags
 CV2PDB := $(shell PATH=`pwd`:$$PATH command -v cv2pdb.exe 2> /dev/null)
 DEBUG ?= 0
@@ -457,7 +455,6 @@ obj/std/ftests/tests \
 obj/tests obj/cu \
 obj/std/json obj/hvlog/json \
 obj/std/centitoml obj/hvlog/centitoml \
-obj/enet \
 sdl/for_final_package
 
 $(shell $(MKDIR) $(FOLDERS))
@@ -623,8 +620,6 @@ deps/zlib/configure.log:
 deps/zlib/libz.a: deps/zlib/configure.log
 	cd deps/zlib && $(MAKE) -f win32/Makefile.gcc PREFIX=$(CROSS_COMPILE) libz.a
 
-obj/enet.a:
-	$(MAKE) -f enet.mk PREFIX=$(CROSS_COMPILE) WARNFLAGS=$(WARNFLAGS) obj/enet.a
 
 include tool_png2ico.mk
 include tool_pngpal2raw.mk

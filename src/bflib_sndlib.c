@@ -18,6 +18,8 @@
  *     (at your option) any later version.
  */
 /******************************************************************************/
+
+#ifndef __linux__
 #include "pre_inc.h"
 #include "bflib_sndlib.h"
 
@@ -262,4 +264,5 @@ struct SampleInfo * PlaySampleFromAddress(SoundEmitterID emit_id, int smpl_idx, 
 /******************************************************************************/
 #ifdef __cplusplus
 }
+#endif
 #endif
